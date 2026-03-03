@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Escala de Atividades Pro</title>
+    <style>
+        :root { --primary: #2c3e50; --secondary: #34495e; --success: #27ae60; --danger: #e74c3c; --accent: #f1c40f; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: var(--primary); }
+        .container { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+        h1 { text-align: center; font-size: 1.5rem; margin-bottom: 20px; }
+        
+        .input-box { display: flex; gap: 8px; margin-bottom: 20px; }
+        input { flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 8px; outline: none; }
+        input:focus { border-color: var(--success); }
+        
+        .btn { padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-add { background: var(--success); color: white; }
+        .btn-nav { background: var(--secondary); color: white; }
+        .btn-sync { background: var(--primary); color: white; width: 100%; margin-top: 10px; }
+
+        .week-display { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 20px; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: #7f8c8d; font-size: 0.9rem; padding: 10px; border-bottom: 2px solid #eee; }
+        td { padding: 15px 10px; border-bottom: 1px solid #eee; }
+        
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+        .badge-rest { background: var(--accent); color: #000; }
+        .badge-work { background: #d1ecf1; color: #0c5460; }
+        .delete-icon { color: var(--danger); cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📋 Escala de Atividades</h1>
+
+    <div class="input-box">
+        <input type="text" id="nomeInput" placeholder="Nome do participante...">
+        <button class="btn btn-add" onclick="adicionar()">Adicionar</button>
+    </div>
+
+    <div class="week-display">
+        <button class="btn btn-nav" onclick="navegarSemana(-1)">⬅</button>
+        <strong id="txtSemana">Semana --</strong>
+        <button class="btn btn-nav" onclick="navegarSemana(1)">➡</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>PARTICIPANTE</th>
+                <th>ATIVIDADE</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="corpoTabela"></tbody>
+    </table>
+
+    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+    
+    <button class="btn btn-sync" onclick="exportarDados()">📤 Copiar Código do Grupo</button>
+    <button class="btn btn-sync" style="background:#6c757d" onclick="importarDados()">📥 Importar via Código</button>
+</div>
+
+<script>
+    // 1. Configurações Iniciais
+    const tarefasObrigatorias = ["Lavar Banheiro", "Cozinhar", "Limpar Sala", "Lixo/Pátio"];
+    let offsetSemana = 0;
+
+    // 2. Lógica de Tempo e "Semente" Aleatória
+    function getSemanaID() {
+        const d = new Date();
+        d.setHours(0,0,0,0);
+        d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+        const anoInicio = new Date(d.getFullYear(), 0, 1);
+        const numeroSemana = Math.ceil((((d - anoInicio) / 86400000) + 1) / 7);
+        return numeroSemana + offsetSemana;
+    }
+
+    // Algoritmo para embaralhar a lista de forma "determinística" (igual para a mesma semana)
+    function embaralhar(lista, semente) {
+        let atual = lista.length, temp, r;
+        while (atual !== 0) {
+            // Gera um número "aleatório" baseado na semente da semana
+            r = Math.floor(Math.abs(Math.sin(semente + atual)) * atual);
+            atual -= 1;
+            temp = lista[atual];
+            lista[atual] = lista[r];
+            lista[r] = temp;
+        }
+        return lista;
+    }
+
+    // 3. Funções de Dados
+    function salvar(pess) { localStorage.setItem("escala_v2", JSON.stringify(pess)); }
+    function carregar() { return JSON.parse(localStorage.getItem("escala_v2")) || []; }
+
+    function adicionar() {
+        const input = document.getElementById("nomeInput");
+        if (!input.value.trim()) return;
+        const lista = carregar();
+        lista.push(input.value.trim());
+        salvar(lista);
+        input.value = "";
+        desenhar();
+    }
+
+    function remover(i) {
+        const lista = carregar();
+        lista.splice(i, 1);
+        salvar(lista);
+        desenhar();
+    }
+
+    // 4. Lógica de Sincronização Global (Simulada via Texto)
+    function exportarDados() {
+        const dados = btoa(JSON.stringify(carregar())); // Transforma em código base64
+        navigator.clipboard.writeText(dados);
+        alert("Código copiado! Mande para seus amigos colarem no sistema deles.");
+    }
+
+    function importarDados() {
+        const codigo = prompt("Cole o código recebido aqui:");
+        if (codigo) {
+            try {
+                const decodificado = JSON.parse(atob(codigo));
+                salvar(decodificado);
+                desenhar();
+            } catch(e) { alert("Código inválido!"); }
+        }
+    }
+
+    function navegarSemana(v) { offsetSemana += v; desenhar(); }
+
+    // 5. Renderização da Escala
+    function desenhar() {
+        const pessoas = carregar();
+        const corpo = document.getElementById("corpoTabela");
+        const semanaID = getSemanaID();
+        document.getElementById("txtSemana").innerText = "Semana " + semanaID;
+        
+        corpo.innerHTML = "";
+
+        // Regra de Negócio: Se > 4 pessoas, adiciona Descanso
+        let tarefasDisponiveis = [...tarefasObrigatorias];
+        if (pessoas.length > 4) {
+            const numDescansos = pessoas.length - tarefasObrigatorias.length;
+            for(let i=0; i < numDescansos; i++) {
+                tarefasDisponiveis.push("Descanso 😴");
+            }
+        }
+
+        // Embaralhamos as tarefas com base na semana para rotacionar sem favoritismo
+        const tarefasSorteadas = embaralhar([...tarefasDisponiveis], semanaID);
+
+        pessoas.forEach((nome, i) => {
+            const tarefa = tarefasSorteadas[i] || "Auxiliar";
+            const ehDescanso = tarefa.includes("Descanso");
+
+            corpo.innerHTML += `
+                <tr>
+                    <td><strong>${nome}</strong></td>
+                    <td><span class="badge ${ehDescanso ? 'badge-rest' : 'badge-work'}">${tarefa}</span></td>
+                    <td><span class="delete-icon" onclick="remover(${i})">×</span></td>
+                </tr>
+            `;
+        });
+    }
+
+    desenhar();
+</script>
+
+</body>
+</html>
