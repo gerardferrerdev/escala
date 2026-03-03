@@ -64,30 +64,32 @@ function renderizar() {
         return;
     }
 
-    // --- REGRA DE NEGÓCIO ---
+    // 1. Definir tarefas da semana
     let tarefasDaVez = [...tarefasPrincipais];
-    
-    // Se tiver 4 ou mais pessoas, adicionamos o "Descanso"
     if (pessoas.length >= 4) {
         tarefasDaVez.push("Descanso 😴");
     }
 
-    // Se houver mais pessoas que tarefas, preenchemos com "Auxiliar"
+    // Ajusta o tamanho da lista de tarefas para bater com o número de pessoas
     while (tarefasDaVez.length < pessoas.length) {
         tarefasDaVez.push("Auxiliar");
     }
 
-    // Embaralha as tarefas com base na semana atual (Semente)
-    const tarefasSorteadas = gerarSorteio([...tarefasDaVez], semanaCiclo);
-
+    // 2. LÓGICA ANTI-REPETIÇÃO:
+    // Em vez de embaralhar aleatoriamente, usamos um deslocamento (offset)
+    // que muda obrigatoriamente a cada semana.
     pessoas.forEach((nome, i) => {
-        const tarefa = tarefasSorteadas[i];
+        // O cálculo (i + semanaCiclo) garante que a tarefa mude TODA semana.
+        // O operador % (módulo) faz a lista de tarefas "girar" como um carrossel.
+        const indiceCalculado = (i + semanaCiclo) % tarefasDaVez.length;
+        const tarefa = tarefasDaVez[indiceCalculado];
+        
         const ehDescanso = tarefa.includes("Descanso");
 
         corpoTabela.innerHTML += `
             <tr>
                 <td><strong>${nome}</strong></td>
-                <td><span class="badge ${ehDescanso ? 'badge-rest' : 'badge-work'}">${tarefa}</span></td>
+                <td><span class="badge ${ehDescanso ? 'badge-rest' : 'badge-work'}" onclick="abrirModal('${tarefa}')">${tarefa}</span></td>
                 <td><span class="delete-icon" onclick="remover(${i})">×</span></td>
             </tr>
         `;
@@ -146,3 +148,40 @@ function toggleTheme() {
         document.getElementById("themeBtn").innerText = "☀️";
     }
 })();
+
+// 1. Dicionário de Descrições das Tarefas
+const descricoesTarefas = {
+    "Lavar o Banheiro": "Limpar o vaso sanitário, lavar o chão, limpar o espelho e repor o papel higiênico.",
+    "Arrumar o Quarto": "Organizar as camas, varrer o chão, tirar o pó dos móveis e organizar os sapatos.",
+    "Devocional": "Preparar o tema do dia, separar os textos bíblicos/reflexões e conduzir o momento de oração.",
+    "Descanso 😴": "Parabéns! Esta semana você está de folga das atividades principais. Aproveite para repor as energias.",
+    "Auxiliar": "Ajudar em qualquer tarefa que esteja sobrecarregada ou conforme a necessidade do grupo."
+};
+
+// 2. Funções do Modal
+function abrirModal(tarefa) {
+    const modal = document.getElementById("modalTarefa");
+    const titulo = document.getElementById("modalTitulo");
+    const descricao = document.getElementById("modalDescricao");
+
+    titulo.innerText = tarefa;
+    // Pega a descrição no dicionário ou usa uma padrão caso não encontre
+    descricao.innerText = descricoesTarefas[tarefa] || "Sem instruções específicas para esta tarefa.";
+
+    modal.style.display = "block";
+}
+
+function fecharModal() {
+    document.getElementById("modalTarefa").style.display = "none";
+}
+
+// Fechar se clicar fora da caixa branca
+window.onclick = function(event) {
+    const modal = document.getElementById("modalTarefa");
+    if (event.target == modal) fecharModal();
+}
+
+// 3. Pequeno ajuste na função renderizar()
+// No loop onde cria as linhas da tabela, mude o <span> da tarefa para incluir o onclick:
+// Substitua o trecho antigo por este:
+// <span class="badge ${ehDescanso ? 'badge-rest' : 'badge-work'}" onclick="abrirModal('${tarefa}')">${tarefa}</span>
