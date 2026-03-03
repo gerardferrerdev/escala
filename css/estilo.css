@@ -1,0 +1,217 @@
+:root {
+    --primary: #4a90e2;
+    --bg: #f1f2f6;
+    --card-bg: #ffffff;
+    --text-main: #2f3542;
+    --text-secondary: #a4b0be;
+    --table-row: #f8f9fa;
+    --danger: #ff4757;
+    --success: #2ed573;
+    --accent: #ffa502;
+    --dark-toggle: #2f3542;
+}
+
+/* Definição de Cores - Modo Escuro */
+[data-theme="dark"] {
+    --bg: #1e1e1e;
+    --card-bg: #2d2d2d;
+    --text-main: #f1f2f6;
+    --text-secondary: #ced6e0;
+    --table-row: #3d3d3d;
+    --dark-toggle: #ffa502; /* O botão muda para amarelo no escuro */
+}
+
+.theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: var(--dark-toggle);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--bg);
+    color: var(--text-main);
+    transition: background-color 0.3s, color 0.3s; /* Transição suave */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center;     /* Centraliza verticalmente */
+    min-height: 100vh;       /* Ocupa 100% da altura da tela */
+    width: 100vw;            /* Ocupa 100% da largura da tela */
+}
+
+.container {
+    background: var(--card-bg);
+    color: var(--text-main);
+    transition: background 0.3s;
+    width: 90%;             /* Em telas pequenas, ocupa 90% da largura */
+    max-width: 450px;       /* Em telas grandes, não passa de 450px */
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    margin: 20px;           /* Margem de segurança para não encostar nas bordas */
+    box-sizing: border-box; /* Garante que o padding não aumente o tamanho final */
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    input, .btn {
+        padding: 14px;      /* Aumenta a área de toque no celular */
+        font-size: 16px;    /* Evita o zoom automático do iOS ao clicar no input */
+    }
+
+    .week-display {
+        padding: 10px;
+    }
+    
+    td {
+        padding: 12px 8px;
+        font-size: 0.9rem;
+    }
+}
+
+h1 {
+    text-align: center;
+    color: var(--text-main);
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+}
+
+/* Estilização dos Inputs e Botões */
+.input-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid #edeff2;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: 0.3s;
+}
+
+input:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn:active { transform: scale(0.95); }
+
+.btn-add { background: var(--primary); color: white; }
+
+/* Controles de Semana */
+.week-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--primary); /* Fundo azul fixo */
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    color: #ffffff; /* Força o texto de fallback a ser branco */
+}
+
+.btn-nav { background: rgba(255,255,255,0.1); color: white; }
+.btn-nav:hover { background: rgba(255,255,255,0.2); }
+
+/* Tabela Moderna */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+
+th {
+    text-align: left;
+    padding: 0 10px;
+    color: var(--secondary);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+td {
+    background: var(--table-row);
+    color: var(--text-main);
+    padding: 15px 10px;
+}
+
+td:first-child { border-radius: 12px 0 0 12px; }
+td:last-child { border-radius: 0 12px 12px 0; }
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    display: inline-block;
+}
+
+.badge-rest { background: #ffeaa7; color: #d6a312; }
+.badge-work { background: #d1f2eb; color: #16a085; }
+
+.sync-section {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Botão de Reset Modernizado */
+.btn-reset {
+    background-color: #fff;
+    color: var(--danger);
+    border: 2px solid #ffeded;
+    padding: 10px;
+    width: 100%;
+    margin-top: 30px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-reset:hover {
+    background-color: #fff5f5;
+    border-color: var(--danger);
+    transform: translateY(-2px);
+}
+
+.btn-reset:active {
+    transform: translateY(0);
+}
+
+/* Um ícone sutil de lixeira ou alerta via CSS (opcional) */
+.btn-reset::before {
+    content: '⚠️';
+    font-size: 0.9rem;
+}
