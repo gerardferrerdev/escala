@@ -1,5 +1,6 @@
 // 1. Configurações e Variáveis Globais
-let semanaCiclo = 1;
+// MODIFICAÇÃO: Agora tenta carregar a semana salva ou inicia em 1
+let semanaCiclo = parseInt(localStorage.getItem("semana_atual")) || 1;
 const tarefasPrincipais = ["Lavar o Banheiro", "Arrumar o Quarto", "Devocional"];
 
 // 2. Funções de Persistência (LocalStorage)
@@ -14,6 +15,10 @@ function navegarSemana(valor) {
         return;
     }
     semanaCiclo += valor;
+
+    // MODIFICAÇÃO: Salva a semana atual para não resetar ao atualizar
+    localStorage.setItem("semana_atual", semanaCiclo);
+    
     renderizar();
 }
 
@@ -38,7 +43,6 @@ function remover(index) {
 }
 
 // 5. Função de Embaralhamento (Algoritmo Determinístico)
-// Usa a semana como semente para que o resultado mude toda semana, mas seja igual para todos
 function gerarSorteio(array, semente) {
     let m = array.length, t, i;
     while (m) {
@@ -70,17 +74,12 @@ function renderizar() {
         tarefasDaVez.push("Descanso 😴");
     }
 
-    // Ajusta o tamanho da lista de tarefas para bater com o número de pessoas
     while (tarefasDaVez.length < pessoas.length) {
         tarefasDaVez.push("Auxiliar");
     }
 
-    // 2. LÓGICA ANTI-REPETIÇÃO:
-    // Em vez de embaralhar aleatoriamente, usamos um deslocamento (offset)
-    // que muda obrigatoriamente a cada semana.
+    // 2. LÓGICA ANTI-REPETIÇÃO
     pessoas.forEach((nome, i) => {
-        // O cálculo (i + semanaCiclo) garante que a tarefa mude TODA semana.
-        // O operador % (módulo) faz a lista de tarefas "girar" como um carrossel.
         const indiceCalculado = (i + semanaCiclo) % tarefasDaVez.length;
         const tarefa = tarefasDaVez[indiceCalculado];
         
@@ -96,7 +95,7 @@ function renderizar() {
     });
 }
 
-// Funções de Importação/Exportação para o grupo
+// Funções de Importação/Exportação
 function exportarDados() {
     const dados = btoa(JSON.stringify(carregar()));
     navigator.clipboard.writeText(dados);
@@ -120,11 +119,13 @@ function resetarTudo() {
     if (confirm("Tem certeza que deseja apagar todos os nomes e voltar para a Semana 1?")) {
         localStorage.clear();
         semanaCiclo = 1;
+        // MODIFICAÇÃO: Garante que a semana volte a ser 1 no armazenamento também
+        localStorage.setItem("semana_atual", 1);
         renderizar();
     }
 }
 
-// Função para trocar o tema
+// Alternar Tema
 function toggleTheme() {
     const html = document.documentElement;
     const btn = document.getElementById("themeBtn");
@@ -140,7 +141,7 @@ function toggleTheme() {
     }
 }
 
-// Verificar preferência salva ao carregar
+// Carregar Tema Salvo
 (function carregarTema() {
     const temaSalvo = localStorage.getItem("tema");
     if (temaSalvo === "dark") {
@@ -149,7 +150,7 @@ function toggleTheme() {
     }
 })();
 
-// 1. Dicionário de Descrições das Tarefas
+// Dicionário de Descrições
 const descricoesTarefas = {
     "Lavar o Banheiro": "Lavar os boxes (paredes e chão), pias e vasos com detergente; Passar pano com desinfetante; Colocar um pouco de desinfetante dentro dos vasos.",
     "Arrumar o Quarto": "Varrer e passar pano no quarto e nos closets; Tirar o lixo e colocar um saco de lixo novo.",
@@ -158,16 +159,14 @@ const descricoesTarefas = {
     "Auxiliar": "Ajudar em qualquer tarefa que esteja sobrecarregada ou conforme a necessidade do grupo."
 };
 
-// 2. Funções do Modal
+// Funções do Modal
 function abrirModal(tarefa) {
     const modal = document.getElementById("modalTarefa");
     const titulo = document.getElementById("modalTitulo");
     const descricao = document.getElementById("modalDescricao");
 
     titulo.innerText = tarefa;
-    // Pega a descrição no dicionário ou usa uma padrão caso não encontre
     descricao.innerText = descricoesTarefas[tarefa] || "Sem instruções específicas para esta tarefa.";
-
     modal.style.display = "block";
 }
 
@@ -175,13 +174,7 @@ function fecharModal() {
     document.getElementById("modalTarefa").style.display = "none";
 }
 
-// Fechar se clicar fora da caixa branca
 window.onclick = function(event) {
     const modal = document.getElementById("modalTarefa");
     if (event.target == modal) fecharModal();
 }
-
-// 3. Pequeno ajuste na função renderizar()
-// No loop onde cria as linhas da tabela, mude o <span> da tarefa para incluir o onclick:
-// Substitua o trecho antigo por este:
-// <span class="badge ${ehDescanso ? 'badge-rest' : 'badge-work'}" onclick="abrirModal('${tarefa}')">${tarefa}</span>
