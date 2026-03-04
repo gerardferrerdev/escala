@@ -151,9 +151,9 @@ function toggleTheme() {
 
 // 1. Dicionário de Descrições das Tarefas
 const descricoesTarefas = {
-    "Lavar o Banheiro": "Limpar o vaso sanitário, lavar o chão, limpar o espelho e repor o papel higiênico.",
-    "Arrumar o Quarto": "Organizar as camas, varrer o chão, tirar o pó dos móveis e organizar os sapatos.",
-    "Devocional": "Preparar o tema do dia, separar os textos bíblicos/reflexões e conduzir o momento de oração.",
+    "Lavar o Banheiro": "Lavar os boxes (paredes e chão), pias e vasos com detergente; Passar pano com desinfetante; Colocar um pouco de desinfetante dentro dos vasos.",
+    "Arrumar o Quarto": "Varrer e passar pano no quarto e nos closets; Tirar o lixo e colocar um saco de lixo novo.",
+    "Devocional": "Preparar um devocional de 25-30 minutos para ser dada na quarta-feira na devocional de quartos.",
     "Descanso 😴": "Parabéns! Esta semana você está de folga das atividades principais. Aproveite para repor as energias.",
     "Auxiliar": "Ajudar em qualquer tarefa que esteja sobrecarregada ou conforme a necessidade do grupo."
 };
