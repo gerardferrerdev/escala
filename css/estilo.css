@@ -13,12 +13,12 @@
 
 /* Definição de Cores - Modo Escuro */
 [data-theme="dark"] {
-    --bg: #1e1e1e;
+    --bg:  #1e1e1e ;
     --card-bg: #2d2d2d;
     --text-main: #f1f2f6;
     --text-secondary: #ced6e0;
     --table-row: #3d3d3d;
-    --dark-toggle: #ffa502; /* O botão muda para amarelo no escuro */
+    --dark-toggle: #1e1e1e;; /* O botão muda para amarelo no escuro */
 }
 
 .theme-toggle {

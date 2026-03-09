@@ -132,11 +132,11 @@ function toggleTheme() {
     
     if (html.getAttribute("data-theme") === "dark") {
         html.removeAttribute("data-theme");
-        btn.innerText = "🌙";
+        btn.innerText = "☀️";
         localStorage.setItem("tema", "light");
     } else {
         html.setAttribute("data-theme", "dark");
-        btn.innerText = "☀️";
+        btn.innerText = "🌙";
         localStorage.setItem("tema", "dark");
     }
 }
